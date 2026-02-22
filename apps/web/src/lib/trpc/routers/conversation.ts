@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { router, protectedProcedure } from '../trpc';
+import { router, protectedProcedure, notFound } from '../trpc';
 import { db } from '@/lib/db';
 
 export const conversationRouter = router({
@@ -72,7 +72,7 @@ export const conversationRouter = router({
       });
 
       if (!conversation) {
-        throw new Error('Conversation not found');
+        throw notFound('Conversation not found');
       }
 
       return conversation;
@@ -116,7 +116,7 @@ export const conversationRouter = router({
       });
 
       if (!existing) {
-        throw new Error('Conversation not found');
+        throw notFound('Conversation not found');
       }
 
       const conversation = await db.conversation.update({
@@ -137,7 +137,7 @@ export const conversationRouter = router({
       });
 
       if (!existing) {
-        throw new Error('Conversation not found');
+        throw notFound('Conversation not found');
       }
 
       await db.conversation.delete({
@@ -151,8 +151,16 @@ export const conversationRouter = router({
   archive: protectedProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      await db.conversation.update({
+      const existing = await db.conversation.findFirst({
         where: { id: input.id, userId: ctx.user.id },
+      });
+
+      if (!existing) {
+        throw notFound('Conversation not found');
+      }
+
+      await db.conversation.update({
+        where: { id: input.id },
         data: { isArchive: true },
       });
 

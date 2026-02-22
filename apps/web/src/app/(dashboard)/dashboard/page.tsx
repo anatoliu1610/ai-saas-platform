@@ -85,7 +85,7 @@ export default function DashboardPage() {
                 <p className="text-xs text-muted-foreground mt-1">Start a new chat!</p>
               </motion.div>
             ) : (
-              conversations?.conversations.map((conv, index) => (
+              (conversations?.conversations ?? []).map((conv: any, index: number) => (
                 <motion.div
                   key={conv.id}
                   initial={{ opacity: 0, x: -20 }}
@@ -249,7 +249,7 @@ function ChatView({ conversationId, onClose }: { conversationId: string; onClose
           </div>
         ) : (
           <AnimatePresence mode="popLayout">
-            {conversation?.messages.map((msg) => (
+            {conversation?.messages.map((msg: any) => (
               <ChatMessage key={msg.id} message={msg} />
             ))}
           </AnimatePresence>

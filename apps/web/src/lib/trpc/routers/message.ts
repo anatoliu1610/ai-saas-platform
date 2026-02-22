@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { router, protectedProcedure, rateLimitedProtectedProcedure } from '../trpc';
+import { router, protectedProcedure, rateLimitedProtectedProcedure, notFound } from '../trpc';
 import { db } from '@/lib/db';
 
 // Mock AI response - in production, integrate with OpenAI/Anthropic/Ollama
@@ -23,6 +23,7 @@ export const messageRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      // Rate limited protected procedure ensures user exists, but add check for type safety
       if (!ctx.user) {
         throw new Error('Unauthorized');
       }
@@ -36,7 +37,7 @@ export const messageRouter = router({
       });
 
       if (!conversation) {
-        throw new Error('Conversation not found');
+        throw notFound('Conversation not found');
       }
 
       // Save user message
@@ -98,7 +99,7 @@ export const messageRouter = router({
       });
 
       if (!message || message.conversation.userId !== ctx.user.id) {
-        throw new Error('Message not found');
+        throw notFound('Message not found');
       }
 
       await db.message.delete({
