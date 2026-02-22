@@ -9,7 +9,6 @@ import {
   setSessionCookie, 
   removeSessionCookie 
 } from '@/lib/auth';
-import { TRPC_ERROR_CODES_BY_NAME } from '@trpc/server';
 
 export const authRouter = router({
   // ============================================
@@ -52,6 +51,7 @@ export const authRouter = router({
           id: true,
           email: true,
           name: true,
+          role: true,
           createdAt: true,
         },
       });

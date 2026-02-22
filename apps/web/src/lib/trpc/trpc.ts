@@ -1,27 +1,10 @@
 import { initTRPC, TRPCError } from '@trpc/server';
-import superjson from 'superjson';
-import { ZodError } from 'zod';
 import { Context } from './context';
 
-const t = initTRPC.context<Context>().create({
-  transformer: superjson,
-  errorFormatter({ shape, error }) {
-    return {
-      ...shape,
-      data: {
-        ...shape.data,
-        zodError:
-          error.cause instanceof ZodError ? error.cause.flatten() : null,
-      },
-    };
-  },
-});
+const t = initTRPC.context<Context>().create();
 
-export const createCallerFactory = t.createCallerFactory;
-
-// ============================================
-// REUSABLE MIDDLEWARE
-// ============================================
+export const router = t.router;
+export const publicProcedure = t.procedure;
 
 /**
  * Protected procedure - requires authentication
@@ -37,8 +20,3 @@ export const protectedProcedure = t.procedure.use(({ ctx, next }) => {
     },
   });
 });
-
-/**
- * Public procedure - no authentication required
- */
-export const publicProcedure = t.procedure;
