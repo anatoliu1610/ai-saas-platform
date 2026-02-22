@@ -10,10 +10,7 @@ FROM base AS deps
 WORKDIR /app
 
 # Copy package files
-COPY package.json pnpm-lock.yaml ./
-COPY apps/web/package.json ./apps/web/
-COPY packages/database/package.json ./packages/database/
-COPY packages/shared/package.json ./packages/shared/
+COPY apps/web/package.json apps/web/pnpm-lock.yaml ./
 
 # Install dependencies
 RUN pnpm install --frozen-lockfile
@@ -25,7 +22,9 @@ FROM base AS builder
 WORKDIR /app
 
 COPY --from=deps /app/node_modules ./node_modules
-COPY . .
+COPY apps/web/ ./apps/web/
+
+WORKDIR /app/apps/web
 
 # Generate Prisma Client
 RUN pnpm db:generate
