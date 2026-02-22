@@ -124,9 +124,9 @@ All APIs are exposed via tRPC routers:
 ### Prerequisites
 - Node.js 20+
 - pnpm 8+
-- Docker & Docker Compose
+- Docker & Docker Compose (for PostgreSQL, Redis)
 
-### Local Development
+### Quick Start (5 minutes)
 
 1. **Clone and install**
 ```bash
@@ -137,17 +137,17 @@ pnpm install
 
 2. **Configure environment**
 ```bash
-cp apps/web/.env.example apps/web/.env
-# Edit .env with your values
+cp apps/web/.env.example apps/web/.env.local
+# Edit .env.local with your values
 ```
 
-3. **Start infrastructure**
+3. **Start database services**
 ```bash
 cd apps/web
-docker-compose up -d
+docker-compose up -d postgres redis
 ```
 
-4. **Setup database**
+4. **Setup database schema**
 ```bash
 pnpm db:generate
 pnpm db:push
@@ -159,6 +159,42 @@ pnpm dev
 ```
 
 Open http://localhost:3000
+
+### Environment Variables
+
+Create `apps/web/.env.local`:
+
+```bash
+# Database (required)
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/ai_saas"
+
+# Auth (required - generate with: openssl rand -base64 32)
+JWT_SECRET="your-super-secret-jwt-key"
+
+# Redis (for rate limiting)
+REDIS_URL="redis://localhost:6379"
+
+# AI (optional - for real AI responses)
+# OPENAI_API_KEY="sk-..."
+# Or use Ollama: OLLAMA_URL="http://localhost:11434"
+```
+
+### Troubleshooting
+
+**Database connection errors:**
+```bash
+# Make sure Docker is running
+docker ps
+
+# Start PostgreSQL and Redis
+docker-compose up -d postgres redis
+```
+
+**Port already in use:**
+```bash
+# Kill process on port 3000
+lsof -ti:3000 | xargs kill -9
+```
 
 ### Docker Production Build
 
