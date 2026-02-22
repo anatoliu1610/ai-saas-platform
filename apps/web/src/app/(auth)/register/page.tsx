@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import { trpc } from '@/lib/trpc/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2, Mail, Lock, User } from 'lucide-react';
 
@@ -40,24 +41,28 @@ export default function RegisterPage() {
         transition={{ duration: 0.5 }}
         className="w-full max-w-md"
       >
-        <Card className="backdrop-blur-sm bg-card/80">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl">Create Account</CardTitle>
+        <Card className="backdrop-blur-sm bg-card/80 border-border/50 shadow-xl">
+          <CardHeader className="text-center space-y-2">
+            <CardTitle className="text-2xl font-bold">Create Account</CardTitle>
             <CardDescription>Start your AI chat journey today</CardDescription>
           </CardHeader>
           
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
               {error && (
-                <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-md">
+                <motion.div 
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="p-3 text-sm text-destructive bg-destructive/10 rounded-lg border border-destructive/20"
+                >
                   {error}
-                </div>
+                </motion.div>
               )}
               
               <div className="space-y-2">
-                <label htmlFor="name" className="text-sm font-medium">Name</label>
+                <Label htmlFor="name">Name</Label>
                 <div className="relative">
-                  <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="name"
                     type="text"
@@ -71,9 +76,9 @@ export default function RegisterPage() {
               </div>
 
               <div className="space-y-2">
-                <label htmlFor="email" className="text-sm font-medium">Email</label>
+                <Label htmlFor="email">Email</Label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="email"
                     type="email"
@@ -87,9 +92,9 @@ export default function RegisterPage() {
               </div>
 
               <div className="space-y-2">
-                <label htmlFor="password" className="text-sm font-medium">Password</label>
+                <Label htmlFor="password">Password</Label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="password"
                     type="password"
@@ -105,7 +110,7 @@ export default function RegisterPage() {
             </CardContent>
 
             <CardFooter className="flex flex-col gap-4">
-              <Button type="submit" className="w-full" disabled={register.isPending}>
+              <Button type="submit" className="w-full h-11" disabled={register.isPending}>
                 {register.isPending ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -118,7 +123,7 @@ export default function RegisterPage() {
               
               <p className="text-sm text-muted-foreground text-center">
                 Already have an account?{' '}
-                <Link href="/login" className="text-primary hover:underline">
+                <Link href="/login" className="text-primary hover:underline font-medium">
                   Sign in
                 </Link>
               </p>
