@@ -246,7 +246,7 @@ export default function HomePage() {
                   className="rounded-2xl border border-white/10 bg-white/5 p-6"
                 >
                   <Quote className="h-8 w-8 text-indigo-500/50 mb-4" />
-                  <p className="text-zinc-300 mb-6">"{testimonial.quote}"</p>
+                  <p className="text-zinc-300 mb-6">&quot;{testimonial.quote}&quot;</p>
                   <div className="flex items-center gap-3">
                     <div className="h-10 w-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-sm font-medium">
                       {testimonial.avatar}
