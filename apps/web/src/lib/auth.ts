@@ -3,21 +3,22 @@ import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
 import { db } from './db';
 
-// Fail fast if JWT_SECRET is not set - never use a fallback in production
-const JWT_SECRET = process.env.JWT_SECRET;
-
-if (!JWT_SECRET) {
-  throw new Error(
-    'JWT_SECRET environment variable is required. ' +
-    'Set it in your .env.local or production environment.'
-  );
-}
-
-// Type assertion for JWT functions - JWT_SECRET is guaranteed to be defined after the check
-const JWT_SECRET_STRING: string = JWT_SECRET;
+// Use placeholder during build, validate at runtime
+const JWT_SECRET = process.env.JWT_SECRET || 'placeholder-build-time-only';
 
 const JWT_EXPIRES_IN = '7d';
 const REFRESH_TOKEN_EXPIRES_IN = '30d';
+
+// Runtime validation - throw only when actually used
+function validateJwtSecret() {
+  if (process.env.JWT_SECRET) return;
+  // Allow placeholder during build, fail at runtime
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('JWT_SECRET environment variable is required in production');
+  }
+}
+
+const JWT_SECRET_STRING: string = JWT_SECRET;
 
 export interface TokenPayload {
   userId: string;
@@ -42,15 +43,18 @@ export async function verifyPassword(password: string, hashedPassword: string): 
 // ============================================
 
 export function generateToken(payload: TokenPayload): string {
+  validateJwtSecret();
   return jwt.sign(payload, JWT_SECRET_STRING, { expiresIn: JWT_EXPIRES_IN });
 }
 
 export function generateRefreshToken(payload: TokenPayload): string {
+  validateJwtSecret();
   return jwt.sign(payload, JWT_SECRET_STRING, { expiresIn: REFRESH_TOKEN_EXPIRES_IN });
 }
 
 export function verifyToken(token: string): TokenPayload | null {
   try {
+    validateJwtSecret();
     return jwt.verify(token, JWT_SECRET_STRING) as TokenPayload;
   } catch {
     return null;
