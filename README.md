@@ -130,7 +130,7 @@ All APIs are exposed via tRPC routers:
 
 1. **Clone and install**
 ```bash
-git clone https://github.com/yourusername/ai-saas-platform.git
+git clone git@github.com:anatoliu1610/ai-saas-platform.git
 cd ai-saas-platform
 pnpm install
 ```
