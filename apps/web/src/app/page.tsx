@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Bot, Zap, Shield, Scale, MessageSquare, Workflow } from 'lucide-react';
+import { Bot, Zap, Shield, Scale, MessageSquare, Workflow, ArrowRight } from 'lucide-react';
 
 const features = [
   {
@@ -39,16 +39,38 @@ const features = [
   },
 ];
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      type: 'spring',
+      stiffness: 100,
+    },
+  },
+};
+
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         {/* Background gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-background dark:from-primary/10" />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-background" />
         
         {/* Animated grid */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:32px_32px]" />
 
         <div className="container relative mx-auto px-4 py-24 sm:px-6 lg:px-8">
           <motion.div
@@ -57,28 +79,48 @@ export default function HomePage() {
             transition={{ duration: 0.5 }}
             className="mx-auto max-w-4xl text-center"
           >
-            <h1 className="text-4xl font-bold tracking-tight sm:text-6xl">
+            <motion.h1 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="text-4xl font-bold tracking-tight sm:text-6xl"
+            >
               AI Chat Platform{' '}
               <span className="text-primary">Built for Production</span>
-            </h1>
+            </motion.h1>
             
-            <p className="mt-6 text-lg leading-8 text-muted-foreground">
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="mt-6 text-lg leading-8 text-muted-foreground text-balance"
+            >
               A production-grade full-stack application demonstrating Staff Engineer-level 
               architecture. Type-safe, secure, and ready to deploy.
-            </p>
+            </motion.p>
             
-            <div className="mt-10 flex items-center justify-center gap-4">
-              <Link href="/register">
-                <Button size="lg" className="text-lg px-8">
-                  Get Started Free
-                </Button>
-              </Link>
-              <Link href="/login">
-                <Button variant="outline" size="lg" className="text-lg px-8">
-                  Sign In
-                </Button>
-              </Link>
-            </div>
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="mt-10 flex items-center justify-center gap-4"
+            >
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <Link href="/register">
+                  <Button size="lg" className="text-lg px-8">
+                    Get Started Free
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
+              </motion.div>
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <Link href="/login">
+                  <Button variant="outline" size="lg" className="text-lg px-8">
+                    Sign In
+                  </Button>
+                </Link>
+              </motion.div>
+            </motion.div>
           </motion.div>
         </div>
       </section>
@@ -101,25 +143,30 @@ export default function HomePage() {
             </p>
           </motion.div>
 
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+          >
             {features.map((feature, index) => (
-              <motion.div
-                key={feature.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-              >
-                <Card className="h-full">
+              <motion.div key={feature.title} variants={itemVariants}>
+                <Card className="h-full hover:shadow-lg transition-shadow duration-300">
                   <CardHeader>
-                    <feature.icon className="h-10 w-10 text-primary mb-2" />
+                    <motion.div
+                      whileHover={{ scale: 1.1, rotate: 5 }}
+                      className="inline-flex"
+                    >
+                      <feature.icon className="h-10 w-10 text-primary mb-2" />
+                    </motion.div>
                     <CardTitle>{feature.title}</CardTitle>
                     <CardDescription>{feature.description}</CardDescription>
                   </CardHeader>
                 </Card>
               </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -135,18 +182,22 @@ export default function HomePage() {
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-8">
               Tech Stack
             </h2>
-            <div className="flex flex-wrap justify-center gap-4">
+            <div className="flex flex-wrap justify-center gap-3">
               {[
                 'React 18', 'TypeScript', 'Next.js 15', 'tRPC',
                 'Prisma', 'PostgreSQL', 'Redis', 'Tailwind CSS',
                 'Framer Motion', 'Docker', 'GitHub Actions',
-              ].map((tech) => (
-                <span
+              ].map((tech, i) => (
+                <motion.span
                   key={tech}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.05 }}
                   className="px-4 py-2 rounded-full bg-secondary text-secondary-foreground text-sm font-medium"
                 >
                   {tech}
-                </span>
+                </motion.span>
               ))}
             </div>
           </motion.div>
