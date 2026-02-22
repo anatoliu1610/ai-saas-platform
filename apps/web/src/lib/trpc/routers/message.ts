@@ -4,7 +4,6 @@ import { db } from '@/lib/db';
 import { generateAIResponse } from '@/lib/ai';
 
 export const messageRouter = router({
-  // Send message and get AI response (rate limited)
   send: rateLimitedProtectedProcedure
     .input(
       z.object({
@@ -17,7 +16,6 @@ export const messageRouter = router({
         throw new Error('Unauthorized');
       }
       
-      // Verify conversation ownership
       const conversation = await db.conversation.findFirst({
         where: {
           id: input.conversationId,
@@ -29,7 +27,6 @@ export const messageRouter = router({
         throw notFound('Conversation not found');
       }
 
-      // Save user message
       const userMessage = await db.message.create({
         data: {
           conversationId: input.conversationId,
@@ -38,11 +35,10 @@ export const messageRouter = router({
         },
       });
 
-      // Get conversation history for context
       const history = await db.message.findMany({
         where: { conversationId: input.conversationId },
         orderBy: { createdAt: 'asc' },
-        take: 20, // Limit context to last 20 messages
+        take: 20,
         select: { role: true, content: true },
       });
 
@@ -52,7 +48,6 @@ export const messageRouter = router({
         { role: 'user' as const, content: input.content },
       ];
 
-      // Generate AI response
       let aiResponse: string;
       let tokens: number;
       let model: string;
@@ -63,13 +58,11 @@ export const messageRouter = router({
         tokens = response.tokens;
         model = response.model;
       } catch (error) {
-        // Fallback to mock response if AI fails
         aiResponse = `I received your message: "${input.content}". Note: AI service is not configured. Set OPENAI_API_KEY or OLLAMA_URL in your environment to enable real AI responses.`;
         tokens = Math.ceil(aiResponse.split(' ').length * 1.3);
         model = 'mock';
       }
 
-      // Save AI response
       const assistantMessage = await db.message.create({
         data: {
           conversationId: input.conversationId,
@@ -80,15 +73,13 @@ export const messageRouter = router({
         },
       });
 
-      // Update conversation timestamp and title if first message
       const messageCount = await db.message.count({
         where: { conversationId: input.conversationId },
       });
       
       const updateData: any = { updatedAt: new Date() };
       
-      // Auto-generate title from first user message
-      if (messageCount === 2) { // First user + first AI response
+      if (messageCount === 2) {
         updateData.title = input.content.slice(0, 50) + (input.content.length > 50 ? '...' : '');
       }
 
@@ -103,7 +94,6 @@ export const messageRouter = router({
       };
     }),
 
-  // Delete message
   delete: protectedProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
