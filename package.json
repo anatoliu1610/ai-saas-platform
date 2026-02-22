@@ -3,12 +3,12 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "turbo dev --filter=web",
-    "build": "turbo build --filter=web",
-    "lint": "turbo lint --filter=web",
-    "test": "turbo test --filter=web",
-    "db:generate": "pnpm --filter=web db:generate",
-    "db:push": "pnpm --filter=web db:push",
+    "dev": "cd apps/web && pnpm dev",
+    "build": "cd apps/web && pnpm build",
+    "lint": "cd apps/web && pnpm lint",
+    "test": "cd apps/web && pnpm test",
+    "db:generate": "cd apps/web && pnpm db:generate",
+    "db:push": "cd apps/web && pnpm db:push",
     "docker:build": "docker build -t ai-saas-web .",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down"
