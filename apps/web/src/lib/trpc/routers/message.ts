@@ -1,20 +1,9 @@
 import { z } from 'zod';
 import { router, protectedProcedure, rateLimitedProtectedProcedure, notFound } from '../trpc';
 import { db } from '@/lib/db';
-
-// Mock AI response - in production, integrate with OpenAI/Anthropic/Ollama
-async function generateAIResponse(messages: { role: string; content: string }[]): Promise<string> {
-  // Simulate AI processing
-  await new Promise(resolve => setTimeout(resolve, 500));
-  
-  const lastMessage = messages[messages.length - 1]?.content || '';
-  
-  // Simple mock response
-  return `I received your message: "${lastMessage}". This is a mock AI response. In production, integrate with OpenAI, Anthropic, or Ollama for real AI responses.`;
-}
+import { generateAIResponse } from '@/lib/ai';
 
 export const messageRouter = router({
-  // Send message and get streaming response (rate limited)
   send: rateLimitedProtectedProcedure
     .input(
       z.object({
@@ -23,12 +12,10 @@ export const messageRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      // Rate limited protected procedure ensures user exists, but add check for type safety
       if (!ctx.user) {
         throw new Error('Unauthorized');
       }
       
-      // Verify conversation ownership
       const conversation = await db.conversation.findFirst({
         where: {
           id: input.conversationId,
@@ -40,7 +27,6 @@ export const messageRouter = router({
         throw notFound('Conversation not found');
       }
 
-      // Save user message
       const userMessage = await db.message.create({
         data: {
           conversationId: input.conversationId,
@@ -49,35 +35,57 @@ export const messageRouter = router({
         },
       });
 
-      // Get conversation history for context
       const history = await db.message.findMany({
         where: { conversationId: input.conversationId },
         orderBy: { createdAt: 'asc' },
+        take: 20,
         select: { role: true, content: true },
       });
 
       const messagesForAI = [
-        ...history.map(m => ({ role: m.role, content: m.content })),
-        { role: 'user', content: input.content },
+        { role: 'system' as const, content: 'You are a helpful AI assistant. Keep responses concise and helpful.' },
+        ...history.map(m => ({ role: m.role as 'user' | 'assistant', content: m.content })),
+        { role: 'user' as const, content: input.content },
       ];
 
-      // Generate AI response
-      const aiResponse = await generateAIResponse(messagesForAI);
+      let aiResponse: string;
+      let tokens: number;
+      let model: string;
+      
+      try {
+        const response = await generateAIResponse(messagesForAI);
+        aiResponse = response.content;
+        tokens = response.tokens;
+        model = response.model;
+      } catch (error) {
+        aiResponse = `I received your message: "${input.content}". Note: AI service is not configured. Set OPENAI_API_KEY or OLLAMA_URL in your environment to enable real AI responses.`;
+        tokens = Math.ceil(aiResponse.split(' ').length * 1.3);
+        model = 'mock';
+      }
 
-      // Save AI response
       const assistantMessage = await db.message.create({
         data: {
           conversationId: input.conversationId,
           role: 'assistant',
           content: aiResponse,
-          tokens: aiResponse.split(' ').length,
+          tokens,
+          metadata: { model },
         },
       });
 
-      // Update conversation timestamp
+      const messageCount = await db.message.count({
+        where: { conversationId: input.conversationId },
+      });
+      
+      const updateData: any = { updatedAt: new Date() };
+      
+      if (messageCount === 2) {
+        updateData.title = input.content.slice(0, 50) + (input.content.length > 50 ? '...' : '');
+      }
+
       await db.conversation.update({
         where: { id: input.conversationId },
-        data: { updatedAt: new Date() },
+        data: updateData,
       });
 
       return {
@@ -86,11 +94,9 @@ export const messageRouter = router({
       };
     }),
 
-  // Delete message
   delete: protectedProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      // Find message and verify ownership through conversation
       const message = await db.message.findUnique({
         where: { id: input.id },
         include: {
