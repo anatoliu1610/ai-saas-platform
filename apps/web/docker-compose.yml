@@ -31,9 +31,9 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var
+      - postgres_data:/var/lib/postgresql/data
 
-/lib/postgresql/data  # Redis (caching, sessions, rate limiting)
+  # Redis (caching, sessions, rate limiting)
   redis:
     image: redis:7-alpine
     ports:
