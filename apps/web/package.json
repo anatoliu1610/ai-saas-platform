@@ -1,0 +1,50 @@
+{
+  "name": "web",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test": "jest",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.10.0",
+    "@radix-ui/react-slot": "^1.0.0",
+    "@tanstack/react-query": "^5.20.0",
+    "@trpc/client": "^11.0.0-rc.300",
+    "@trpc/next": "^11.0.0-rc.300",
+    "@trpc/react-query": "^11.0.0-rc.300",
+    "@trpc/server": "^11.0.0-rc.300",
+    "bcryptjs": "^2.4.3",
+    "clsx": "^2.1.0",
+    "framer-motion": "^11.0.0",
+    "ioredis": "^5.3.0",
+    "jsonwebtoken": "^9.0.0",
+    "lucide-react": "^0.330.0",
+    "next": "15.1.0",
+    "next-themes": "^0.2.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "superjson": "^3.0.0",
+    "tailwind-merge": "^2.2.0",
+    "zod": "^3.22.0"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.0",
+    "@types/jsonwebtoken": "^9.0.0",
+    "@types/node": "^20.11.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "autoprefixer": "^10.4.0",
+    "eslint": "^8.56.0",
+    "eslint-config-next": "15.1.0",
+    "postcss": "^8.4.0",
+    "prisma": "^5.10.0",
+    "tailwindcss": "^3.4.0",
+    "typescript": "^5.3.0"
+  }
+}
