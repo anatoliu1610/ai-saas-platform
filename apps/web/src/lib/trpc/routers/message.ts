@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { router, protectedProcedure } from '../trpc';
+import { router, protectedProcedure, rateLimitedProtectedProcedure } from '../trpc';
 import { db } from '@/lib/db';
 
 // Mock AI response - in production, integrate with OpenAI/Anthropic/Ollama
@@ -14,15 +14,19 @@ async function generateAIResponse(messages: { role: string; content: string }[])
 }
 
 export const messageRouter = router({
-  // Send message and get streaming response
-  send: protectedProcedure
+  // Send message and get streaming response (rate limited)
+  send: rateLimitedProtectedProcedure
     .input(
       z.object({
         conversationId: z.string(),
-        content: z.string().min(1),
+        content: z.string().min(1).max(10000),
       })
     )
     .mutation(async ({ ctx, input }) => {
+      if (!ctx.user) {
+        throw new Error('Unauthorized');
+      }
+      
       // Verify conversation ownership
       const conversation = await db.conversation.findFirst({
         where: {
@@ -65,7 +69,7 @@ export const messageRouter = router({
           conversationId: input.conversationId,
           role: 'assistant',
           content: aiResponse,
-          tokens: aiResponse.split(' ').length, // Rough token estimate
+          tokens: aiResponse.split(' ').length,
         },
       });
 
