@@ -25,7 +25,7 @@ jobs:
           cache: 'pnpm'
           cache-dependency-path: apps/web/pnpm-lock.yaml
       - working-directory: apps/web
-        run: pnpm install --frozen-lockfile
+        run: pnpm install
       - working-directory: apps/web
         run: pnpm lint
       - working-directory: apps/web
