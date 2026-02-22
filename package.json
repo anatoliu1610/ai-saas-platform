@@ -2,18 +2,13 @@
   "name": "ai-saas-platform",
   "version": "1.0.0",
   "private": true,
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
   "scripts": {
-    "dev": "turbo dev",
-    "build": "turbo build",
-    "lint": "turbo lint",
-    "test": "turbo test",
-    "db:generate": "pnpm --filter database generate",
-    "db:push": "pnpm --filter database push",
-    "db:migrate": "pnpm --filter database migrate",
+    "dev": "cd apps/web && pnpm dev",
+    "build": "cd apps/web && pnpm build",
+    "lint": "cd apps/web && pnpm lint",
+    "test": "cd apps/web && pnpm test",
+    "db:generate": "cd apps/web && pnpm db:generate",
+    "db:push": "cd apps/web && pnpm db:push",
     "docker:build": "docker build -t ai-saas-web .",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down"
