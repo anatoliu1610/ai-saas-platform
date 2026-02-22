@@ -56,7 +56,6 @@ export default function RegisterPage() {
               
               <div className="space-y-2">
                 <label htmlFor="name" className="text-sm font-medium">Name</label>
-                name" className="text-sm font-medium">Name</label>
                 <div className="relative">
                   <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
